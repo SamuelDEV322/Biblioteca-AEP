@@ -17,10 +17,6 @@ class GeneroSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class LibroSerializer(serializers.ModelSerializer):
-    autor = AutorSerializer()
-    editorial = EditorialSerializer()
-    genero = GeneroSerializer()
-
     class Meta:
         model = Libro
         fields = '__all__'

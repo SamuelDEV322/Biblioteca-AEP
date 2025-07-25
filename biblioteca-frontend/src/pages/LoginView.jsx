@@ -1,79 +1,78 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import api from '../api/api'
-import qs from 'qs'
+import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 
-const Login = () => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+const LoginView = () => {
   const navigate = useNavigate()
+  const [formData, setFormData] = useState({ username: '', password: '' })
+  const [error, setError] = useState('')
 
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
-      const response = await api.post(
-        'login/',
-        qs.stringify({
-          username,
-          password,
-        }),
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        }
-      )
-      console.log("Token recibido:", response.data.token)
+      const params = new URLSearchParams()
+      params.append('username', formData.username)
+      params.append('password', formData.password)
 
-      // Guarda el token en localStorage
+      const response = await api.post('/login/', params)
       localStorage.setItem('token', response.data.token)
-
-      // Limpia errores y redirige
-      setError('')
       navigate('/libros')
     } catch (err) {
       console.error(err)
-      setError('Credenciales incorrectas o servidor no disponible.')
+      setError('Credenciales inválidas')
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{
+        backgroundImage: 'url(/fondo-login.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backdropFilter: 'blur(4px)',
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white bg-opacity-90 shadow-xl p-8 rounded-lg w-full max-w-sm"
       >
-        <h2 className="text-2xl font-semibold text-center mb-6">Iniciar Sesión</h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <h2 className="text-2xl font-bold mb-6 text-center text-indigo-700 flex justify-center items-center gap-2">
+          <span className="text-xl">⇨</span> Inicio de Sesión
+        </h2>
 
-        <input
-          type="text"
-          placeholder="Usuario"
-          className="w-full p-2 border rounded mb-4"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Usuario"
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            required
+          />
 
-        <input
-          type="password"
-          placeholder="Contraseña"
-          className="w-full p-2 border rounded mb-6"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-        >
-          Entrar
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white font-semibold py-2 rounded-md hover:bg-indigo-700 transition-all"
+          >
+            Entrar
+          </button>
+        </form>
+      </motion.div>
     </div>
   )
 }
 
-export default Login
+export default LoginView

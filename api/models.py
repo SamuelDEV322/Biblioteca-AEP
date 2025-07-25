@@ -16,12 +16,14 @@ class Genero(models.Model):
     def __str__(self):
         return self.nombre
 
+
 class Libro(models.Model):
     titulo = models.CharField(max_length=200)
     autor = models.CharField(max_length=100)
     editorial = models.CharField(max_length=100)
     genero = models.CharField(max_length=100)
-    fecha_publicacion = models.DateField(null=True, blank=True)
+    anio_publicacion = models.DateField(null=True, blank=True, auto_now_add=True)
+    codigo = models.CharField(max_length=100, unique=True)  # Aquí se guarda el CDD
     disponible = models.BooleanField(default=True)
 
     def __str__(self):
